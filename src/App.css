@@ -122,25 +122,49 @@ h3 {
   display: grid;
   gap: 6px;
   width: 100%;
-  padding: 16px;
+  padding: 14px;
   border: 1px solid #e2e8f0;
   border-left: 6px solid var(--route-color);
   border-radius: 8px;
-  color: #334155;
   background: #ffffff;
+  color: #334155;
   text-align: left;
+  cursor: pointer;
 }
 
 .route-card:hover {
   border-color: #bfdbfe;
-  border-left-color: var(--route-color);
-  background: #f8fbff;
 }
 
 .route-card.selected {
+  border-color: #93c5fd;
+  background: #f3f9ff;
+}
+
+.route-card.active {
   border-color: #2563eb;
-  border-left-color: var(--route-color);
-  background: #eff6ff;
+  box-shadow: inset 0 0 0 1px #2563eb;
+}
+
+.route-card-head {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.route-check {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  border: 2px solid #cbd5e1;
+  border-radius: 50%;
+  background: #ffffff;
+}
+
+.route-check.on {
+  border-color: var(--route-color);
+  background: var(--route-color);
+  box-shadow: inset 0 0 0 2px #ffffff;
 }
 
 .route-card-title {
@@ -463,13 +487,111 @@ h3 {
   font-size: 13px;
 }
 
+.recent-search {
+  margin: 16px 22px 0;
+  padding-top: 14px;
+  border-top: 1px solid #eef2f7;
+}
+
+.recent-search-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.recent-search-title {
+  color: #334155;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.recent-clear {
+  padding: 2px 4px;
+  border: none;
+  background: transparent;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.recent-clear:hover {
+  color: #2563eb;
+}
+
+.recent-tabs {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: thin;
+  cursor: grab;
+  user-select: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.recent-tabs:active {
+  cursor: grabbing;
+}
+
+.recent-tab {
+  display: flex;
+  flex: none;
+  align-items: center;
+  border: 1px solid #cbd5e1;
+  border-radius: 999px;
+  background: #f8fafc;
+  overflow: hidden;
+}
+
+.recent-tab:hover {
+  border-color: #93c5fd;
+}
+
+.recent-tab-run {
+  max-width: 180px;
+  padding: 6px 4px 6px 13px;
+  border: none;
+  background: transparent;
+  color: #334155;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+.recent-tab-run:hover {
+  color: #2563eb;
+}
+
+.recent-tab-remove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 30px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #94a3b8;
+  font-size: 17px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.recent-tab-remove:hover {
+  color: #ef4444;
+}
+
 .map-panel {
-  margin-top: 18px;
   padding-bottom: 18px;
 }
 
 .map-view {
-  height: 440px;
+  height: 620px;
   margin: 14px 22px 0;
   border: 1px solid #e2e8f0;
   border-radius: 10px;
@@ -530,5 +652,121 @@ h3 {
     height: 360px;
     margin-right: 16px;
     margin-left: 16px;
+  }
+}
+
+/* 지도 중심 레이아웃 */
+.map-layout {
+  display: grid;
+  grid-template-columns: minmax(320px, 380px) minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.control-column {
+  display: grid;
+  gap: 20px;
+}
+
+.map-column {
+  position: sticky;
+  top: 20px;
+}
+
+/* 노선 선택 카드 */
+.route-list-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.route-toggle-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.route-toggle-actions button {
+  padding: 6px 11px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  color: #334155;
+  background: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.route-toggle-actions button:hover {
+  border-color: #93c5fd;
+}
+
+.route-card-head .route-card-meta {
+  margin-left: auto;
+}
+
+/* 클릭 가능한 추천 결과 */
+.nearest-item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+}
+
+.nearest-item:hover {
+  border-color: #93c5fd;
+  background: #f0f7ff;
+}
+
+.nearest-item.active {
+  border-color: #2563eb;
+  background: #eff6ff;
+}
+
+.nearest-body strong {
+  display: block;
+  color: #111827;
+}
+
+.nearest-body span {
+  display: block;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.nearest-go {
+  color: #2563eb;
+  font-size: 13px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+/* 포커스 강조 */
+.map-stop-dot.focused {
+  width: 18px;
+  height: 18px;
+  border-color: #ef4444;
+  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.3);
+}
+
+.map-stop-label.focused {
+  background: #ef4444;
+  color: #ffffff;
+}
+
+@media (max-width: 1024px) {
+  .map-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .map-column {
+    position: static;
+  }
+
+  .map-view {
+    height: 460px;
   }
 }

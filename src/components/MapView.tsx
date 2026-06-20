@@ -4,14 +4,22 @@ import type { GeocodeResult } from '../lib/geocode'
 import type { BusRoute, NearestResult } from '../types/route'
 
 interface MapViewProps {
-  route: BusRoute
+  routes: BusRoute[]
+  visibleRouteIds: number[]
   userLocation: GeocodeResult | null
   nearestResults: NearestResult[]
+  focusedStopId: string | null
 }
 
 const WONJU_CENTER = { lat: 37.3422, lng: 127.9202 }
 
-export function MapView({ route, userLocation, nearestResults }: MapViewProps) {
+export function MapView({
+  routes,
+  visibleRouteIds,
+  userLocation,
+  nearestResults,
+  focusedStopId,
+}: MapViewProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<KakaoMap | null>(null)
   const overlaysRef = useRef<KakaoOverlay[]>([])
@@ -43,7 +51,7 @@ export function MapView({ route, userLocation, nearestResults }: MapViewProps) {
     }
   }, [])
 
-  // 노선/검색 상태가 바뀔 때마다 오버레이 다시 그림
+  // 표시 노선/검색/포커스가 바뀔 때마다 오버레이 다시 그림
   useEffect(() => {
     const map = mapRef.current
     if (status !== 'ready' || !map) return
@@ -54,99 +62,121 @@ export function MapView({ route, userLocation, nearestResults }: MapViewProps) {
     overlaysRef.current = []
     const track = (overlay: KakaoOverlay) => overlaysRef.current.push(overlay)
 
+    const visibleRoutes = routes.filter((route) => visibleRouteIds.includes(route.id))
+    const showLabels = visibleRoutes.length === 1
+    const topStopIds = new Set(nearestResults.map((result) => result.stop.id))
+
     const bounds = new maps.LatLngBounds()
-    const stops = route.stops.filter((stop) => stop.lat !== undefined && stop.lng !== undefined)
-    const path = stops.map((stop) => new maps.LatLng(stop.lat!, stop.lng!))
+    let hasBoundsPoint = false
+    let focusPosition: KakaoLatLng | null = null
 
-    if (path.length > 1) {
-      track(
-        new maps.Polyline({
-          path,
-          strokeWeight: 5,
-          strokeColor: route.color,
-          strokeOpacity: 0.9,
-          strokeStyle: 'solid',
-          map,
-        }),
-      )
-    }
+    visibleRoutes.forEach((route) => {
+      const stops = route.stops.filter((stop) => stop.lat !== undefined && stop.lng !== undefined)
+      const path = stops.map((stop) => new maps.LatLng(stop.lat!, stop.lng!))
 
-    stops.forEach((stop) => {
-      const position = new maps.LatLng(stop.lat!, stop.lng!)
-      bounds.extend(position)
-      track(
-        new maps.CustomOverlay({
-          position,
-          content: `<span class="map-stop-dot" style="background:${route.color}"></span>`,
-          map,
-          xAnchor: 0.5,
-          yAnchor: 0.5,
-          zIndex: 2,
-        }),
-      )
-      track(
-        new maps.CustomOverlay({
-          position,
-          content: `<span class="map-stop-label">${stop.name}</span>`,
-          map,
-          xAnchor: 0.5,
-          yAnchor: 0,
-          zIndex: 2,
-        }),
-      )
+      if (path.length > 1) {
+        track(
+          new maps.Polyline({
+            path,
+            strokeWeight: 5,
+            strokeColor: route.color,
+            strokeOpacity: 0.85,
+            strokeStyle: 'solid',
+            map,
+          }),
+        )
+      }
+
+      stops.forEach((stop) => {
+        const position = new maps.LatLng(stop.lat!, stop.lng!)
+        bounds.extend(position)
+        hasBoundsPoint = true
+        const focused = stop.id === focusedStopId
+        if (focused) focusPosition = position
+
+        track(
+          new maps.CustomOverlay({
+            position,
+            content: `<span class="map-stop-dot${focused ? ' focused' : ''}" style="background:${route.color}"></span>`,
+            map,
+            xAnchor: 0.5,
+            yAnchor: 0.5,
+            zIndex: focused ? 6 : 2,
+          }),
+        )
+
+        if (showLabels || focused || topStopIds.has(stop.id)) {
+          track(
+            new maps.CustomOverlay({
+              position,
+              content: `<span class="map-stop-label${focused ? ' focused' : ''}">${stop.name}</span>`,
+              map,
+              xAnchor: 0.5,
+              yAnchor: 0,
+              zIndex: focused ? 6 : 3,
+            }),
+          )
+        }
+      })
     })
 
     if (userLocation) {
-      const userPos = new maps.LatLng(userLocation.lat, userLocation.lng)
-      bounds.extend(userPos)
+      const userPosition = new maps.LatLng(userLocation.lat, userLocation.lng)
+      bounds.extend(userPosition)
+      hasBoundsPoint = true
       track(
         new maps.CustomOverlay({
-          position: userPos,
+          position: userPosition,
           content: '<span class="map-user-pin">내 위치</span>',
           map,
           xAnchor: 0.5,
           yAnchor: 1,
-          zIndex: 4,
+          zIndex: 7,
         }),
       )
 
       nearestResults.forEach((result, index) => {
         if (result.stop.lat === undefined || result.stop.lng === undefined) return
-        const stopPos = new maps.LatLng(result.stop.lat, result.stop.lng)
-        bounds.extend(stopPos)
+        const stopPosition = new maps.LatLng(result.stop.lat, result.stop.lng)
+        bounds.extend(stopPosition)
+        hasBoundsPoint = true
         track(
           new maps.Polyline({
-            path: [userPos, stopPos],
+            path: [userPosition, stopPosition],
             strokeWeight: 3,
             strokeColor: '#1e293b',
-            strokeOpacity: 0.7,
+            strokeOpacity: 0.6,
             strokeStyle: 'shortdash',
             map,
           }),
         )
         track(
           new maps.CustomOverlay({
-            position: stopPos,
+            position: stopPosition,
             content: `<span class="map-rank-badge">${index + 1}</span>`,
             map,
             xAnchor: 0.5,
             yAnchor: 0.5,
-            zIndex: 5,
+            zIndex: 8,
           }),
         )
       })
     }
 
-    if (stops.length > 0 || userLocation) {
+    // 포커스된 정류장이 있으면 그쪽으로 이동, 아니면 전체가 보이도록 맞춤
+    if (focusPosition) {
+      map.setLevel(4)
+      map.setCenter(focusPosition)
+    } else if (hasBoundsPoint) {
       map.setBounds(bounds)
     }
-  }, [route, userLocation, nearestResults, status])
+  }, [routes, visibleRouteIds, userLocation, nearestResults, focusedStopId, status])
 
   return (
     <section className="panel map-panel" aria-labelledby="map-title">
       <div className="section-heading">
         <p className="eyebrow">지도</p>
-        <h2 id="map-title">{route.name} 노선도</h2>
+        <h2 id="map-title">노선 지도</h2>
       </div>
       {status === 'error' && (
         <div className="empty-state">

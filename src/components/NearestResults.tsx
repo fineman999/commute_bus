@@ -3,9 +3,16 @@ import type { NearestResult } from '../types/route'
 interface NearestResultsProps {
   results: NearestResult[]
   hasUserLocation: boolean
+  focusedStopId: string | null
+  onSelectStop: (result: NearestResult) => void
 }
 
-export function NearestResults({ results, hasUserLocation }: NearestResultsProps) {
+export function NearestResults({
+  results,
+  hasUserLocation,
+  focusedStopId,
+  onSelectStop,
+}: NearestResultsProps) {
   if (!hasUserLocation) {
     return (
       <div className="empty-state">
@@ -17,25 +24,35 @@ export function NearestResults({ results, hasUserLocation }: NearestResultsProps
   if (results.length === 0) {
     return (
       <div className="empty-state">
-        아직 정류장 좌표가 등록되지 않아 거리 분석 결과를 만들 수 없습니다. Phase 2에서
-        검증된 좌표를 추가하면 이 영역에 가까운 정류장이 표시됩니다.
+        검색 위치 근처에 좌표가 등록된 정류장이 없습니다.
       </div>
     )
   }
 
   return (
     <ol className="nearest-list">
-      {results.map((result) => (
-        <li className="nearest-item" key={`${result.route.id}-${result.stop.id}`}>
-          <span className="nearest-rank">{result.route.name}</span>
-          <span>
-            <strong>{result.stop.name}</strong>
-            <span>
-              {result.stop.dong} · 직선거리 {result.distanceKm.toFixed(2)}km
-            </span>
-          </span>
-        </li>
-      ))}
+      {results.map((result, index) => {
+        const active = result.stop.id === focusedStopId
+        return (
+          <li key={`${result.route.id}-${result.stop.id}`}>
+            <button
+              className={`nearest-item ${active ? 'active' : ''}`}
+              onClick={() => onSelectStop(result)}
+              type="button"
+            >
+              <span className="nearest-rank">{index + 1}</span>
+              <span className="nearest-body">
+                <strong>{result.stop.name}</strong>
+                <span>
+                  {result.route.name} · {result.stop.dong} · 직선거리{' '}
+                  {result.distanceKm.toFixed(2)}km
+                </span>
+              </span>
+              <span className="nearest-go">지도 ›</span>
+            </button>
+          </li>
+        )
+      })}
     </ol>
   )
 }
