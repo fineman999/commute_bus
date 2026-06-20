@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { AddressSearch } from './components/AddressSearch'
+import { MapView } from './components/MapView'
 import { NeighborhoodSummary } from './components/NeighborhoodSummary'
 import { NearestResults } from './components/NearestResults'
 import { RouteDetail } from './components/RouteDetail'
@@ -134,6 +135,12 @@ function App() {
           </section>
         </div>
       </section>
+
+      <MapView
+        nearestResults={nearestResults}
+        route={selectedRoute}
+        userLocation={selectedLocation}
+      />
     </main>
   )
 }
