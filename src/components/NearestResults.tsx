@@ -9,7 +9,7 @@ export function NearestResults({ results, hasUserLocation }: NearestResultsProps
   if (!hasUserLocation) {
     return (
       <div className="empty-state">
-        위도와 경도를 입력하면 좌표가 등록된 정류장을 기준으로 Top 3를 계산합니다.
+        주소나 장소명을 검색하면 가장 가까운 정류장 Top 3를 계산합니다.
       </div>
     )
   }
