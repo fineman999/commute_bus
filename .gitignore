@@ -14,6 +14,7 @@ dist-ssr
 
 # Local working docs (not committed)
 docs/
+scripts/kakao-coordinate-collector/output/
 
 # Env (실제 키는 .env.local 에만; .env.example 은 커밋)
 .env

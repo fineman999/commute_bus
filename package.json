@@ -8,6 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "test": "node --test tests/**/*.test.ts",
+    "coords:collect": "node --env-file=.env.local scripts/kakao-coordinate-collector/collect.mjs",
+    "coords:snippet": "node scripts/kakao-coordinate-collector/snippet.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
