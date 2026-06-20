@@ -109,22 +109,24 @@ export function AddressSearch({
           <p className="candidate-hint">
             검색 결과 {candidates.length}건 — 정확한 위치를 선택하세요.
           </p>
-          {candidates.map((candidate, index) => {
-            const selected =
-              selectedLocation?.lat === candidate.lat &&
-              selectedLocation?.lng === candidate.lng
-            return (
-              <button
-                className={`candidate-item ${selected ? 'selected' : ''}`}
-                key={`${candidate.lat}-${candidate.lng}-${index}`}
-                onClick={() => onSelectCandidate(candidate)}
-                type="button"
-              >
-                <strong>{candidate.label}</strong>
-                <span>{candidate.address}</span>
-              </button>
-            )
-          })}
+          <div className="candidate-scroll">
+            {candidates.map((candidate, index) => {
+              const selected =
+                selectedLocation?.lat === candidate.lat &&
+                selectedLocation?.lng === candidate.lng
+              return (
+                <button
+                  className={`candidate-item ${selected ? 'selected' : ''}`}
+                  key={`${candidate.lat}-${candidate.lng}-${index}`}
+                  onClick={() => onSelectCandidate(candidate)}
+                  type="button"
+                >
+                  <strong>{candidate.label}</strong>
+                  <span>{candidate.address}</span>
+                </button>
+              )
+            })}
+          </div>
         </div>
       )}
 

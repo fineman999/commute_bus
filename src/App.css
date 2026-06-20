@@ -457,6 +457,15 @@ h3 {
   font-weight: 700;
 }
 
+.candidate-scroll {
+  display: grid;
+  gap: 8px;
+  max-height: 230px;
+  overflow-y: auto;
+  padding-right: 4px;
+  scrollbar-width: thin;
+}
+
 .candidate-item {
   display: grid;
   gap: 3px;
