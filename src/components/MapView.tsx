@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { loadKakaoSdk } from '../lib/kakaoLoader'
+import { routePaths } from '../data/routePaths'
 import type { GeocodeResult } from '../lib/geocode'
 import type { BusRoute, NearestResult } from '../types/route'
 
@@ -72,12 +73,17 @@ export function MapView({
 
     visibleRoutes.forEach((route) => {
       const stops = route.stops.filter((stop) => stop.lat !== undefined && stop.lng !== undefined)
-      const path = stops.map((stop) => new maps.LatLng(stop.lat!, stop.lng!))
+      // 도로 경로(precompute)가 있으면 도로를 따라 그리고, 없으면 정류장 직선 연결로 폴백
+      const roadPath = routePaths[route.id]
+      const linePath =
+        roadPath && roadPath.length > 1
+          ? roadPath.map(([lat, lng]) => new maps.LatLng(lat, lng))
+          : stops.map((stop) => new maps.LatLng(stop.lat!, stop.lng!))
 
-      if (path.length > 1) {
+      if (linePath.length > 1) {
         track(
           new maps.Polyline({
-            path,
+            path: linePath,
             strokeWeight: 5,
             strokeColor: route.color,
             strokeOpacity: 0.85,
