@@ -202,18 +202,48 @@ export function MapView({
     }
   }, [routes, visibleRouteIds, userLocation, nearestResults, focusedStopId, status])
 
+  // 지도 위 범례/빈 상태 안내에 쓰는 표시 중 노선 목록(렌더 시점 기준)
+  const visibleRoutes = routes.filter((route) => visibleRouteIds.includes(route.id))
+
   return (
     <section className="panel map-panel" aria-labelledby="map-title">
       <div className="section-heading">
         <p className="eyebrow">지도</p>
         <h2 id="map-title">노선 지도</h2>
       </div>
-      {status === 'error' && (
-        <div className="empty-state">
-          {errorMessage} 카카오 콘솔 Web 플랫폼의 사이트 도메인 등록을 확인하세요.
-        </div>
-      )}
-      <div className="map-view" ref={containerRef} />
+      <div className="map-frame">
+        <div className="map-view" ref={containerRef} />
+        {status === 'loading' && (
+          <div className="map-overlay" role="status">
+            <span className="map-spinner" aria-hidden="true" />
+            지도 불러오는 중…
+          </div>
+        )}
+        {status === 'error' && (
+          <div className="map-overlay map-overlay-error" role="alert">
+            {errorMessage} 카카오 콘솔 Web 플랫폼의 사이트 도메인 등록을 확인하세요.
+          </div>
+        )}
+        {status === 'ready' && visibleRoutes.length === 0 && !userLocation && (
+          <div className="map-overlay map-overlay-empty">
+            표시할 노선을 선택하거나 주소를 검색하세요.
+          </div>
+        )}
+        {status === 'ready' && visibleRoutes.length > 0 && (
+          <ul className="map-legend" aria-label="표시 중 노선 범례">
+            {visibleRoutes.map((route) => (
+              <li key={route.id}>
+                <span
+                  className="map-legend-swatch"
+                  style={{ background: route.color }}
+                  aria-hidden="true"
+                />
+                {route.name}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </section>
   )
 }

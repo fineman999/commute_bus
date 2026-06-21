@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { AddressSearch } from './components/AddressSearch'
 import { MapView } from './components/MapView'
 import { NeighborhoodSummary } from './components/NeighborhoodSummary'
@@ -34,6 +34,10 @@ function App() {
   const [selectedLocation, setSelectedLocation] = useState<GeocodeResult | null>(null)
   const [nearestResults, setNearestResults] = useState<NearestResult[]>([])
   const [recentSearches, setRecentSearches] = useState<SavedSearch[]>(() => loadRecentSearches())
+
+  // 비동기 지오코딩의 경쟁 상태 방지: 검색을 새로 시작/취소할 때마다 토큰을 올리고,
+  // 응답이 돌아왔을 때 토큰이 바뀌었으면(더 최신 검색이 시작됨) 결과를 버린다.
+  const searchSeq = useRef(0)
 
   const directionRoutes = useMemo(
     () => routes.filter((route) => route.direction === direction),
@@ -120,6 +124,7 @@ function App() {
     const query = address.trim()
     if (!query) return
 
+    const seq = ++searchSeq.current
     setGeocoding(true)
     setGeocodeError(null)
     setCandidates([])
@@ -129,6 +134,7 @@ function App() {
 
     try {
       const results = await geocodeAddress(query)
+      if (seq !== searchSeq.current) return // 더 최신 검색/초기화가 시작됨 → 무시
       if (results.length === 0) {
         setGeocodeError('검색 결과가 없습니다. 주소나 장소명을 다시 확인해 주세요.')
         return
@@ -136,16 +142,19 @@ function App() {
       setCandidates(results)
       applyLocation(results[0], query)
     } catch (error) {
+      if (seq !== searchSeq.current) return
       setGeocodeError(
         error instanceof Error ? error.message : '주소 검색 중 오류가 발생했습니다.',
       )
     } finally {
-      setGeocoding(false)
+      if (seq === searchSeq.current) setGeocoding(false)
     }
   }
 
   function handleReset() {
+    searchSeq.current++ // 진행 중인 검색 응답이 초기화 상태를 덮어쓰지 못하게 무효화
     setAddress('')
+    setGeocoding(false)
     setGeocodeError(null)
     setCandidates([])
     setSelectedLocation(null)
@@ -159,7 +168,9 @@ function App() {
   }
 
   function runSavedSearch(saved: SavedSearch) {
+    searchSeq.current++ // 진행 중인 검색 응답이 저장된 검색 결과를 덮어쓰지 못하게 무효화
     setAddress(saved.query)
+    setGeocoding(false)
     setGeocodeError(null)
     setCandidates([])
     applyLocation(
@@ -255,12 +266,14 @@ function App() {
               <p className="eyebrow">Top 3</p>
               <h2 id="nearest-title">가까운 {direction} 정류장</h2>
             </div>
-            <NearestResults
-              focusedStopId={focusedStopId}
-              hasUserLocation={selectedLocation !== null}
-              onSelectStop={focusStop}
-              results={nearestResults}
-            />
+            <div aria-live="polite">
+              <NearestResults
+                focusedStopId={focusedStopId}
+                hasUserLocation={selectedLocation !== null}
+                onSelectStop={focusStop}
+                results={nearestResults}
+              />
+            </div>
           </section>
           <RouteList
             detailRouteId={detailRouteId}

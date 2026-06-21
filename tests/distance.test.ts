@@ -19,6 +19,7 @@ test('findNearest ignores stops without coordinates and sorts by distance', () =
     {
       id: 1,
       name: '제1노선',
+      direction: '출근',
       description: '테스트 노선',
       color: '#2563eb',
       stops: [
@@ -29,6 +30,7 @@ test('findNearest ignores stops without coordinates and sorts by distance', () =
     {
       id: 2,
       name: '제2노선',
+      direction: '출근',
       description: '테스트 노선',
       color: '#059669',
       stops: [{ id: 'near', name: '가까운 정류장', dong: '반곡동', lat: 37.34, lng: 127.92 }],
