@@ -15,12 +15,16 @@ import {
   saveRecentSearch,
   type SavedSearch,
 } from './lib/searchStorage'
-import type { NearestResult } from './types/route'
+import type { Direction, NearestResult } from './types/route'
 import './App.css'
 
+const firstRouteId = (dir: Direction) =>
+  routes.find((route) => route.direction === dir)?.id ?? routes[0].id
+
 function App() {
-  const [visibleRouteIds, setVisibleRouteIds] = useState<number[]>(() => [routes[0].id])
-  const [detailRouteId, setDetailRouteId] = useState<number>(routes[0].id)
+  const [direction, setDirection] = useState<Direction>('출근')
+  const [visibleRouteIds, setVisibleRouteIds] = useState<number[]>(() => [firstRouteId('출근')])
+  const [detailRouteId, setDetailRouteId] = useState<number>(() => firstRouteId('출근'))
   const [focusedStopId, setFocusedStopId] = useState<string | null>(null)
 
   const [address, setAddress] = useState('')
@@ -29,24 +33,42 @@ function App() {
   const [candidates, setCandidates] = useState<GeocodeResult[]>([])
   const [selectedLocation, setSelectedLocation] = useState<GeocodeResult | null>(null)
   const [nearestResults, setNearestResults] = useState<NearestResult[]>([])
-  const [recentSearches, setRecentSearches] = useState<SavedSearch[]>(() =>
-    loadRecentSearches(),
+  const [recentSearches, setRecentSearches] = useState<SavedSearch[]>(() => loadRecentSearches())
+
+  const directionRoutes = useMemo(
+    () => routes.filter((route) => route.direction === direction),
+    [direction],
   )
 
   const detailRoute = useMemo(
-    () => routes.find((route) => route.id === detailRouteId) ?? routes[0],
-    [detailRouteId],
+    () => directionRoutes.find((route) => route.id === detailRouteId) ?? directionRoutes[0],
+    [directionRoutes, detailRouteId],
   )
 
-  const totalStops = routes.reduce((sum, route) => sum + route.stops.length, 0)
+  const directionStops = directionRoutes.reduce((sum, route) => sum + route.stops.length, 0)
+
+  function changeDirection(next: Direction) {
+    if (next === direction) return
+    setDirection(next)
+    setFocusedStopId(null)
+    const dRoutes = routes.filter((route) => route.direction === next)
+    const firstId = dRoutes[0].id
+    setDetailRouteId(firstId)
+    if (selectedLocation) {
+      const results = findNearest(selectedLocation.lat, selectedLocation.lng, dRoutes)
+      setNearestResults(results)
+      setVisibleRouteIds([...new Set([firstId, ...results.map((result) => result.route.id)])])
+    } else {
+      setNearestResults([])
+      setVisibleRouteIds([firstId])
+    }
+  }
 
   function toggleRoute(routeId: number) {
-    // 정류장 포커스를 풀어야 지도가 표시 노선 전체에 맞게 다시 잡힌다
     setFocusedStopId(null)
     if (visibleRouteIds.includes(routeId)) {
       const next = visibleRouteIds.filter((id) => id !== routeId)
       setVisibleRouteIds(next)
-      // 끄는 노선이 상세였다면 남은 표시 노선으로 상세를 옮긴다
       if (detailRouteId === routeId && next.length > 0) setDetailRouteId(next[0])
     } else {
       setVisibleRouteIds((prev) => [...prev, routeId])
@@ -56,7 +78,7 @@ function App() {
 
   function showAllRoutes() {
     setFocusedStopId(null)
-    setVisibleRouteIds(routes.map((route) => route.id))
+    setVisibleRouteIds(directionRoutes.map((route) => route.id))
   }
 
   function hideAllRoutes() {
@@ -75,7 +97,7 @@ function App() {
   function applyLocation(location: GeocodeResult, query: string) {
     setSelectedLocation(location)
     setFocusedStopId(null)
-    const results = findNearest(location.lat, location.lng, routes)
+    const results = findNearest(location.lat, location.lng, directionRoutes)
     setNearestResults(results)
     ensureRoutesVisible(results.map((result) => result.route.id))
 
@@ -137,7 +159,6 @@ function App() {
   }
 
   function runSavedSearch(saved: SavedSearch) {
-    // 저장된 좌표로 바로 계산 — 지오코딩 API를 다시 거치지 않는다
     setAddress(saved.query)
     setGeocodeError(null)
     setCandidates([])
@@ -163,18 +184,18 @@ function App() {
           <p className="eyebrow">원주 통근버스</p>
           <h1>노선 확인과 거리 분석</h1>
           <p className="header-copy">
-            반곡동 혁신도시로 향하는 9개 통근버스 노선을 지도에서 비교하고, 집을 구할 때
-            어느 동네가 탑승하기 편한지 빠르게 확인합니다.
+            건강보험심사평가원 출퇴근 통근버스 노선을 지도에서 비교하고, 집을 구할 때 어느
+            동네가 타기 편한지 빠르게 확인합니다.
           </p>
         </div>
         <dl className="stats">
           <div>
-            <dt>노선</dt>
-            <dd>{routes.length}</dd>
+            <dt>{direction} 노선</dt>
+            <dd>{directionRoutes.length}</dd>
           </div>
           <div>
             <dt>정류장</dt>
-            <dd>{totalStops}</dd>
+            <dd>{directionStops}</dd>
           </div>
           <div>
             <dt>표시 중</dt>
@@ -185,6 +206,25 @@ function App() {
 
       <section className="map-layout" aria-label="지도 분석">
         <div className="control-column">
+          <div className="direction-toggle" role="group" aria-label="출퇴근 방향 선택">
+            <button
+              aria-pressed={direction === '출근'}
+              className={direction === '출근' ? 'active' : ''}
+              onClick={() => changeDirection('출근')}
+              type="button"
+            >
+              출근 <span>2사옥 도착</span>
+            </button>
+            <button
+              aria-pressed={direction === '퇴근'}
+              className={direction === '퇴근' ? 'active' : ''}
+              onClick={() => changeDirection('퇴근')}
+              type="button"
+            >
+              퇴근 <span>1사옥 출발</span>
+            </button>
+          </div>
+
           <AddressSearch
             address={address}
             candidates={candidates}
@@ -203,7 +243,7 @@ function App() {
           <section className="panel" aria-labelledby="nearest-title">
             <div className="section-heading">
               <p className="eyebrow">Top 3</p>
-              <h2 id="nearest-title">가까운 정류장 결과</h2>
+              <h2 id="nearest-title">가까운 {direction} 정류장</h2>
             </div>
             <NearestResults
               focusedStopId={focusedStopId}
@@ -217,7 +257,7 @@ function App() {
             onHideAll={hideAllRoutes}
             onShowAll={showAllRoutes}
             onToggleRoute={toggleRoute}
-            routes={routes}
+            routes={directionRoutes}
             visibleRouteIds={visibleRouteIds}
           />
         </div>
@@ -226,7 +266,7 @@ function App() {
           <MapView
             focusedStopId={focusedStopId}
             nearestResults={nearestResults}
-            routes={routes}
+            routes={directionRoutes}
             userLocation={selectedLocation}
             visibleRouteIds={visibleRouteIds}
           />

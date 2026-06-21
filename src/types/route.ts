@@ -8,9 +8,12 @@ export interface Stop {
   lng?: number
 }
 
+export type Direction = '출근' | '퇴근'
+
 export interface BusRoute {
   id: number
   name: string
+  direction: Direction
   description: string
   stops: Stop[]
   color: string

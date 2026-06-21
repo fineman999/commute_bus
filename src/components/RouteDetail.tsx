@@ -22,15 +22,18 @@ export function RouteDetail({ route }: RouteDetailProps) {
         ))}
       </div>
       <ol className="stop-list">
-        {route.stops.map((stop) => (
-          <li className="stop-item" key={stop.id}>
-            <span className="stop-time">{stop.time ?? '도착'}</span>
-            <span>
-              <strong>{stop.name}</strong>
-              <span>{stop.code ? `${stop.dong} · ${stop.code}` : stop.dong}</span>
-            </span>
-          </li>
-        ))}
+        {route.stops.map((stop, index) => {
+          const badge = stop.time ?? (index === route.stops.length - 1 ? '도착' : '경유')
+          return (
+            <li className="stop-item" key={stop.id}>
+              <span className="stop-time">{badge}</span>
+              <span>
+                <strong>{stop.name}</strong>
+                <span>{stop.code ? `${stop.dong} · ${stop.code}` : stop.dong}</span>
+              </span>
+            </li>
+          )
+        })}
       </ol>
     </section>
   )
