@@ -44,7 +44,7 @@ export function RouteList({
           </button>
         </div>
       </div>
-      <div className="grid gap-2.5 p-4">
+      <div className="grid max-h-[520px] gap-2.5 overflow-y-auto p-4 [scrollbar-width:thin] min-[1120px]:max-h-[360px]">
         {routes.map((route) => {
           const visible = visibleRouteIds.includes(route.id)
           const active = route.id === detailRouteId
@@ -56,16 +56,16 @@ export function RouteList({
           return (
             <button
               aria-pressed={visible}
-              className={`grid w-full gap-1.5 rounded-lg border border-l-[6px] p-3 text-left transition-colors ${stateClasses}`}
+              className={`grid w-full gap-2 rounded-lg border border-l-[6px] p-3 text-left transition-colors ${stateClasses}`}
               key={route.id}
               onClick={() => onToggleRoute(route.id)}
               style={{ borderLeftColor: route.color } as CSSProperties}
               type="button"
             >
-              <span className="flex items-center gap-2.5">
+              <span className="flex items-start gap-2.5">
                 <span
                   aria-hidden="true"
-                  className={`h-4 w-4 flex-none rounded-full border-2 ${
+                  className={`mt-0.5 h-4 w-4 flex-none rounded-full border-2 ${
                     visible
                       ? 'shadow-[inset_0_0_0_2px_var(--surface)]'
                       : 'border-border-strong bg-surface'
@@ -74,12 +74,23 @@ export function RouteList({
                     visible ? { backgroundColor: route.color, borderColor: route.color } : undefined
                   }
                 />
-                <span className="text-[16px] font-extrabold text-heading">{route.name}</span>
-                <span className="ml-auto text-[13px] text-subtle">
-                  {route.stops.length} 정류장
+                <span className="min-w-0">
+                  <span className="block text-[15px] font-extrabold leading-tight text-heading">
+                    {route.name}
+                  </span>
+                  <span className="mt-1 block text-[13px] leading-relaxed text-fg">
+                    {route.description}
+                  </span>
+                </span>
+                <span className="ml-auto flex-none whitespace-nowrap rounded-full bg-muted px-2 py-1 text-[12px] font-bold text-subtle">
+                  {route.stops.length}개
                 </span>
               </span>
-              <span className="text-[14px] text-fg">{route.description}</span>
+              {active && (
+                <span className="ml-[26px] text-[12px] font-extrabold text-brand">
+                  상세 표시 중
+                </span>
+              )}
             </button>
           )
         })}

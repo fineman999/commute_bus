@@ -36,27 +36,31 @@ export function NearestResults({
         return (
           <li key={`${result.route.id}-${result.stop.id}`}>
             <button
-              className={`grid w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 rounded-lg border p-2.5 text-left transition-colors ${
+              className={`grid w-full grid-cols-[auto_minmax(0,1fr)] items-start gap-3 rounded-lg border p-3 text-left transition-colors ${
                 active
-                  ? 'border-brand bg-brand-soft'
+                  ? 'border-brand bg-brand-soft ring-1 ring-inset ring-brand'
                   : 'border-border bg-muted hover:border-brand-soft-border hover:bg-hover'
               }`}
               onClick={() => onSelectStop(result)}
               type="button"
             >
-              <span className="min-w-[46px] rounded-md bg-brand-soft px-[7px] py-1 text-center text-[12px] font-extrabold text-brand-soft-fg">
+              <span className="grid h-9 w-9 place-items-center rounded-md bg-brand text-[13px] font-extrabold text-brand-fg">
                 {index + 1}
               </span>
               <span className="min-w-0">
-                <strong className="block text-heading">{result.stop.name}</strong>
-                <span className="block text-[13px] text-subtle">
-                  {result.route.name} · {result.stop.dong}
-                  {result.stop.time ? ` · 출발 ${result.stop.time}` : ''} · 직선거리{' '}
-                  {result.distanceKm.toFixed(2)}km
+                <span className="mb-1 flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+                  <strong className="text-heading">{result.stop.name}</strong>
+                  <span className="text-[15px] font-extrabold text-brand">
+                    {result.distanceKm.toFixed(2)}km
+                  </span>
                 </span>
-              </span>
-              <span className="whitespace-nowrap text-[13px] font-extrabold text-brand">
-                지도 ›
+                <span className="block text-[13px] leading-relaxed text-subtle">
+                  {result.route.name} · {result.stop.dong}
+                  {result.stop.time ? ` · 출발 ${result.stop.time}` : ''} · 직선거리
+                </span>
+                <span className="mt-2 inline-flex text-[13px] font-extrabold text-brand">
+                  지도에서 보기
+                </span>
               </span>
             </button>
           </li>

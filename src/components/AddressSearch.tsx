@@ -67,6 +67,9 @@ export function AddressSearch({
         <h2 id="address-title" className="text-[18px] font-bold leading-tight text-heading">
           주소로 가까운 정류장 찾기
         </h2>
+        <p className="mt-1.5 text-[13px] text-subtle">
+          직선거리 기준이라 실제 도보 이동과는 차이가 있을 수 있습니다.
+        </p>
       </div>
 
       <form
@@ -76,17 +79,20 @@ export function AddressSearch({
           onSearch()
         }}
       >
-        <input
-          aria-label="주소 또는 장소명"
-          className="field"
-          onChange={(event) => onAddressChange(event.target.value)}
-          placeholder="예: 원주시 무실동 / 단구초등학교"
-          value={address}
-        />
-        <div className="flex flex-wrap gap-2.5">
+        <div className="grid gap-2 min-[520px]:grid-cols-[minmax(0,1fr)_auto]">
+          <input
+            aria-label="주소 또는 장소명"
+            className="field"
+            onChange={(event) => onAddressChange(event.target.value)}
+            placeholder="예: 원주시 무실동 / 단구초등학교"
+            value={address}
+          />
           <button className="btn-primary" disabled={geocoding} type="submit">
             {geocoding ? '검색 중…' : '검색'}
           </button>
+        </div>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <span className="text-[13px] text-subtle">장소명도 검색할 수 있습니다.</span>
           <button className="btn-secondary" onClick={onReset} type="button">
             초기화
           </button>
@@ -104,7 +110,8 @@ export function AddressSearch({
 
       {selectedLocation && (
         <div className="mx-4 mt-4 grid gap-1 rounded-lg border border-brand-soft-border bg-brand-soft px-4 py-3.5">
-          <strong className="text-brand-soft-fg">{selectedLocation.label}</strong>
+          <span className="text-[12px] font-extrabold text-brand-soft-fg">분석 기준 위치</span>
+          <strong className="text-heading">{selectedLocation.label}</strong>
           <span className="text-[14px] text-fg">{selectedLocation.address}</span>
         </div>
       )}
@@ -123,7 +130,7 @@ export function AddressSearch({
                 <button
                   className={`grid gap-[3px] rounded-lg border px-[13px] py-[11px] text-left transition-colors ${
                     selected
-                      ? 'border-brand bg-brand-soft'
+                      ? 'border-brand bg-brand-soft ring-1 ring-inset ring-brand'
                       : 'border-border bg-surface hover:border-brand-soft-border'
                   }`}
                   key={`${candidate.lat}-${candidate.lng}-${index}`}

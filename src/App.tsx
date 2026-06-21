@@ -190,69 +190,61 @@ function App() {
   }
 
   return (
-    <main className="mx-auto w-[calc(100%-24px)] pb-14 pt-7 min-[900px]:w-[min(1180px,calc(100%-32px))] min-[900px]:pt-10">
-      <header className="mb-7 grid grid-cols-1 items-end gap-8 min-[900px]:grid-cols-[minmax(0,1fr)_auto]">
-        <div>
-          <p className="eyebrow">원주 통근버스</p>
-          <h1 className="mb-3 max-w-[680px] text-[34px] font-bold leading-[1.12] text-heading min-[900px]:text-[44px]">
-            노선 확인과 거리 분석
-          </h1>
-          <p className="mb-0 max-w-[720px] text-[17px] text-fg">
-            건강보험심사평가원 출퇴근 통근버스 노선을 지도에서 비교하고, 집을 구할 때 어느
-            동네가 타기 편한지 빠르게 확인합니다.
-          </p>
-        </div>
-        <div className="flex flex-col items-start gap-3 min-[900px]:items-end">
+    <main className="mx-auto w-[calc(100%-24px)] pb-14 pt-5 min-[900px]:w-[min(1280px,calc(100%-32px))] min-[900px]:pt-8">
+      <header className="mb-5 grid grid-cols-1 gap-5">
+        <div className="flex flex-col gap-4 min-[860px]:flex-row min-[860px]:items-end min-[860px]:justify-between">
+          <div>
+            <p className="eyebrow">원주 통근버스</p>
+            <h1 className="mb-2 max-w-[680px] text-[30px] font-extrabold leading-[1.12] text-heading min-[900px]:text-[42px]">
+              노선 확인과 거리 분석
+            </h1>
+            <p className="mb-0 max-w-[760px] text-[16px] text-fg min-[900px]:text-[17px]">
+              건강보험심사평가원 출퇴근 노선을 비교하고, 주소 기준 가까운 정류장 Top 3를
+              확인합니다.
+            </p>
+          </div>
           <button
             aria-label={theme === 'dark' ? '라이트 모드로 전환' : '다크 모드로 전환'}
-            className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-[13px] font-bold text-fg transition-colors hover:border-brand-soft-border"
+            className="inline-flex min-h-[40px] w-fit items-center rounded-lg border border-border bg-surface px-3.5 text-[13px] font-extrabold text-fg transition-colors hover:border-brand-soft-border"
             onClick={toggleTheme}
             type="button"
           >
-            {theme === 'dark' ? '☀️ 라이트' : '🌙 다크'}
+            {theme === 'dark' ? '라이트 모드' : '다크 모드'}
           </button>
-          <dl className="m-0 grid w-full grid-cols-1 gap-2.5 min-[560px]:grid-cols-3">
-            <div className="min-w-[86px] rounded-lg border border-border-strong bg-surface px-4 py-3.5">
-              <dt className="text-[13px] text-subtle">{direction} 노선</dt>
-              <dd className="mt-0.5 text-[26px] font-extrabold text-heading">
-                {directionRoutes.length}
-              </dd>
-            </div>
-            <div className="min-w-[86px] rounded-lg border border-border-strong bg-surface px-4 py-3.5">
-              <dt className="text-[13px] text-subtle">정류장</dt>
-              <dd className="mt-0.5 text-[26px] font-extrabold text-heading">{directionStops}</dd>
-            </div>
-            <div className="min-w-[86px] rounded-lg border border-border-strong bg-surface px-4 py-3.5">
-              <dt className="text-[13px] text-subtle">표시 중</dt>
-              <dd className="mt-0.5 text-[26px] font-extrabold text-heading">
-                {visibleRouteIds.length}
-              </dd>
-            </div>
+        </div>
+
+        <div className="panel grid gap-3 p-3 min-[760px]:grid-cols-[minmax(300px,420px)_minmax(0,1fr)] min-[760px]:items-center">
+          <div
+            className="grid grid-cols-2 gap-2 rounded-[10px] border border-border-strong bg-muted p-1.5"
+            role="group"
+            aria-label="출퇴근 방향 선택"
+          >
+            <DirectionButton
+              active={direction === '출근'}
+              onClick={() => changeDirection('출근')}
+              label="출근"
+              sub="2사옥 도착"
+            />
+            <DirectionButton
+              active={direction === '퇴근'}
+              onClick={() => changeDirection('퇴근')}
+              label="퇴근"
+              sub="1사옥 출발"
+            />
+          </div>
+          <dl className="m-0 grid grid-cols-3 gap-2">
+            <StatItem label={`${direction} 노선`} value={directionRoutes.length} />
+            <StatItem label="정류장" value={directionStops} />
+            <StatItem label="표시 중" value={visibleRouteIds.length} />
           </dl>
         </div>
       </header>
 
-      <div
-        className="mb-5 grid max-w-[440px] grid-cols-2 gap-2 rounded-[10px] border border-border-strong bg-surface p-1.5 shadow-card"
-        role="group"
-        aria-label="출퇴근 방향 선택"
+      <section
+        className="grid grid-cols-1 items-start gap-5 min-[1120px]:grid-cols-[minmax(0,1.42fr)_minmax(360px,0.78fr)]"
+        aria-label="지도 분석"
       >
-        <DirectionButton
-          active={direction === '출근'}
-          onClick={() => changeDirection('출근')}
-          label="출근"
-          sub="2사옥 도착"
-        />
-        <DirectionButton
-          active={direction === '퇴근'}
-          onClick={() => changeDirection('퇴근')}
-          label="퇴근"
-          sub="1사옥 출발"
-        />
-      </div>
-
-      <section className="grid grid-cols-1 gap-5" aria-label="지도 분석">
-        <div className="min-w-0">
+        <div className="min-w-0 min-[1120px]:sticky min-[1120px]:top-5">
           <MapView
             focusedStopId={focusedStopId}
             nearestResults={nearestResults}
@@ -262,7 +254,7 @@ function App() {
           />
         </div>
 
-        <div className="grid grid-cols-1 items-start gap-5 min-[820px]:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.2fr)]">
+        <div className="grid grid-cols-1 items-start gap-5 min-[760px]:grid-cols-2 min-[1120px]:grid-cols-1">
           <AddressSearch
             address={address}
             candidates={candidates}
@@ -278,7 +270,7 @@ function App() {
             recentSearches={recentSearches}
             selectedLocation={selectedLocation}
           />
-          <section className="panel" aria-labelledby="nearest-title">
+          <section className="panel min-[760px]:min-h-full min-[1120px]:min-h-0" aria-labelledby="nearest-title">
             <div className="section-heading px-4 pt-3.5 pb-3">
               <p className="eyebrow">Top 3</p>
               <h2 id="nearest-title" className="text-[18px] font-bold leading-tight text-heading">
@@ -294,14 +286,16 @@ function App() {
               />
             </div>
           </section>
-          <RouteList
-            detailRouteId={detailRouteId}
-            onHideAll={hideAllRoutes}
-            onShowAll={showAllRoutes}
-            onToggleRoute={toggleRoute}
-            routes={directionRoutes}
-            visibleRouteIds={visibleRouteIds}
-          />
+          <div className="min-[760px]:col-span-2 min-[1120px]:col-span-1">
+            <RouteList
+              detailRouteId={detailRouteId}
+              onHideAll={hideAllRoutes}
+              onShowAll={showAllRoutes}
+              onToggleRoute={toggleRoute}
+              routes={directionRoutes}
+              visibleRouteIds={visibleRouteIds}
+            />
+          </div>
         </div>
       </section>
 
@@ -330,13 +324,27 @@ function DirectionButton({ active, onClick, label, sub }: DirectionButtonProps) 
       className={`grid gap-0.5 rounded-lg border px-3 py-2.5 text-[15px] font-extrabold transition-colors ${
         active
           ? 'border-brand-strong bg-brand text-brand-fg'
-          : 'border-transparent bg-muted text-fg'
+          : 'border-transparent bg-surface text-fg hover:border-brand-soft-border'
       }`}
       onClick={onClick}
       type="button"
     >
       {label} <span className={`text-[11px] font-bold ${active ? 'text-blue-100' : 'text-subtle'}`}>{sub}</span>
     </button>
+  )
+}
+
+interface StatItemProps {
+  label: string
+  value: number
+}
+
+function StatItem({ label, value }: StatItemProps) {
+  return (
+    <div className="rounded-lg border border-border bg-surface px-3 py-2.5">
+      <dt className="truncate text-[12px] font-bold text-subtle">{label}</dt>
+      <dd className="mt-0.5 text-[24px] font-extrabold leading-none text-heading">{value}</dd>
+    </div>
   )
 }
 

@@ -23,7 +23,7 @@ export function RouteDetail({ route }: RouteDetailProps) {
           </span>
         ))}
       </div>
-      <ol className="m-0 grid list-none gap-2.5 px-[22px] py-[22px]">
+      <ol className="m-0 grid list-none gap-2.5 px-[22px] py-[22px] min-[760px]:grid-cols-2">
         {route.stops.map((stop, index) => {
           const badge = stop.time ?? (index === route.stops.length - 1 ? '도착' : '경유')
           return (

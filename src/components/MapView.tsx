@@ -209,14 +209,19 @@ export function MapView({
     'absolute inset-0 z-[1] flex items-center justify-center gap-2.5 p-6 text-center text-[14px] font-bold'
 
   return (
-    <section className="panel pb-[18px]" aria-labelledby="map-title">
-      <div className="section-heading">
-        <p className="eyebrow">지도</p>
-        <h2 id="map-title" className="text-[22px] font-bold leading-tight text-heading">
-          노선 지도
-        </h2>
+    <section className="panel pb-4" aria-labelledby="map-title">
+      <div className="section-heading flex flex-col gap-1 min-[560px]:flex-row min-[560px]:items-end min-[560px]:justify-between">
+        <div>
+          <p className="eyebrow">지도</p>
+          <h2 id="map-title" className="text-[22px] font-bold leading-tight text-heading">
+            노선 지도
+          </h2>
+        </div>
+        <p className="m-0 text-[13px] font-bold text-subtle">
+          노선 선택과 검색 결과가 지도에 함께 표시됩니다.
+        </p>
       </div>
-      <div className="relative mx-4 mt-3.5 h-[360px] overflow-hidden rounded-[10px] border border-border min-[560px]:mx-[22px] min-[560px]:h-[460px] min-[820px]:h-[620px]">
+      <div className="relative mx-4 mt-3.5 h-[360px] overflow-hidden rounded-[10px] border border-border min-[560px]:mx-[22px] min-[560px]:h-[480px] min-[1120px]:h-[690px]">
         <div className="h-full w-full" ref={containerRef} />
         {status === 'loading' && (
           <div className={`${overlayBase} bg-muted text-fg`} role="status">
@@ -236,7 +241,7 @@ export function MapView({
         )}
         {status === 'ready' && visibleRoutes.length > 0 && (
           <ul
-            className="absolute bottom-3 left-3 z-[2] m-0 flex max-w-[calc(100%-24px)] list-none flex-wrap gap-x-3 gap-y-1 rounded-lg border border-border bg-surface/90 px-3 py-2 shadow-[0_2px_8px_rgba(15,23,42,0.12)]"
+            className="absolute bottom-3 left-3 z-[2] m-0 flex max-h-[116px] max-w-[calc(100%-24px)] list-none flex-wrap gap-x-3 gap-y-1 overflow-y-auto rounded-lg border border-border bg-surface/90 px-3 py-2 shadow-[0_2px_8px_rgba(15,23,42,0.12)] [scrollbar-width:thin]"
             aria-label="표시 중 노선 범례"
           >
             {visibleRoutes.map((route) => (
