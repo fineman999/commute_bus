@@ -22,12 +22,12 @@ export function RouteDetail({ route }: RouteDetailProps) {
         ))}
       </div>
       <ol className="stop-list">
-        {route.stops.map((stop, index) => (
+        {route.stops.map((stop) => (
           <li className="stop-item" key={stop.id}>
-            <span className="stop-order">{String(index + 1).padStart(2, '0')}</span>
+            <span className="stop-time">{stop.time ?? '도착'}</span>
             <span>
               <strong>{stop.name}</strong>
-              <span>{stop.dong}</span>
+              <span>{stop.code ? `${stop.dong} · ${stop.code}` : stop.dong}</span>
             </span>
           </li>
         ))}

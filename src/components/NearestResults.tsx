@@ -44,7 +44,8 @@ export function NearestResults({
               <span className="nearest-body">
                 <strong>{result.stop.name}</strong>
                 <span>
-                  {result.route.name} · {result.stop.dong} · 직선거리{' '}
+                  {result.route.name} · {result.stop.dong}
+                  {result.stop.time ? ` · 출발 ${result.stop.time}` : ''} · 직선거리{' '}
                   {result.distanceKm.toFixed(2)}km
                 </span>
               </span>

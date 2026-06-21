@@ -230,6 +230,7 @@ h3 {
 }
 
 .stop-order,
+.stop-time,
 .nearest-rank {
   min-width: 46px;
   padding: 4px 7px;
@@ -239,6 +240,10 @@ h3 {
   font-size: 12px;
   font-weight: 800;
   text-align: center;
+}
+
+.stop-time {
+  white-space: nowrap;
 }
 
 .stop-item strong,
