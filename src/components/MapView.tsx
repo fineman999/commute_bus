@@ -205,36 +205,44 @@ export function MapView({
   // 지도 위 범례/빈 상태 안내에 쓰는 표시 중 노선 목록(렌더 시점 기준)
   const visibleRoutes = routes.filter((route) => visibleRouteIds.includes(route.id))
 
+  const overlayBase =
+    'absolute inset-0 z-[1] flex items-center justify-center gap-2.5 p-6 text-center text-[14px] font-bold'
+
   return (
-    <section className="panel map-panel" aria-labelledby="map-title">
+    <section className="panel pb-[18px]" aria-labelledby="map-title">
       <div className="section-heading">
         <p className="eyebrow">지도</p>
-        <h2 id="map-title">노선 지도</h2>
+        <h2 id="map-title" className="text-[22px] font-bold leading-tight text-heading">
+          노선 지도
+        </h2>
       </div>
-      <div className="map-frame">
-        <div className="map-view" ref={containerRef} />
+      <div className="relative mx-4 mt-3.5 h-[360px] overflow-hidden rounded-[10px] border border-border min-[560px]:mx-[22px] min-[560px]:h-[460px] min-[820px]:h-[620px]">
+        <div className="h-full w-full" ref={containerRef} />
         {status === 'loading' && (
-          <div className="map-overlay" role="status">
+          <div className={`${overlayBase} bg-muted text-fg`} role="status">
             <span className="map-spinner" aria-hidden="true" />
             지도 불러오는 중…
           </div>
         )}
         {status === 'error' && (
-          <div className="map-overlay map-overlay-error" role="alert">
+          <div className={`${overlayBase} bg-danger-bg text-danger`} role="alert">
             {errorMessage} 카카오 콘솔 Web 플랫폼의 사이트 도메인 등록을 확인하세요.
           </div>
         )}
         {status === 'ready' && visibleRoutes.length === 0 && !userLocation && (
-          <div className="map-overlay map-overlay-empty">
+          <div className={`${overlayBase} bg-muted/85 text-fg`}>
             표시할 노선을 선택하거나 주소를 검색하세요.
           </div>
         )}
         {status === 'ready' && visibleRoutes.length > 0 && (
-          <ul className="map-legend" aria-label="표시 중 노선 범례">
+          <ul
+            className="absolute bottom-3 left-3 z-[2] m-0 flex max-w-[calc(100%-24px)] list-none flex-wrap gap-x-3 gap-y-1 rounded-lg border border-border bg-surface/90 px-3 py-2 shadow-[0_2px_8px_rgba(15,23,42,0.12)]"
+            aria-label="표시 중 노선 범례"
+          >
             {visibleRoutes.map((route) => (
-              <li key={route.id}>
+              <li key={route.id} className="flex items-center gap-1.5 text-[12px] font-bold text-fg">
                 <span
-                  className="map-legend-swatch"
+                  className="h-3 w-3 flex-none rounded-[3px]"
                   style={{ background: route.color }}
                   aria-hidden="true"
                 />

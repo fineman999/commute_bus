@@ -16,6 +16,19 @@
       content="출퇴근 통근버스 노선을 지도에서 비교하고, 집 주소 기준 가장 가까운 정류장을 찾아보세요."
     />
     <meta property="og:locale" content="ko_KR" />
+    <script>
+      // paint 전에 테마를 적용해 라이트→다크 깜빡임(FOUC)을 막는다.
+      // 저장된 선호 > OS 설정 순. (키는 useTheme.ts 와 동일하게 유지)
+      ;(function () {
+        try {
+          var saved = localStorage.getItem('commute-bus-theme')
+          var dark =
+            saved === 'dark' ||
+            (!saved && matchMedia('(prefers-color-scheme: dark)').matches)
+          if (dark) document.documentElement.classList.add('dark')
+        } catch (e) {}
+      })()
+    </script>
   </head>
   <body>
     <div id="root"></div>

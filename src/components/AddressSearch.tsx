@@ -61,14 +61,16 @@ export function AddressSearch({
     onRunRecent(saved)
   }
   return (
-    <section className="panel search-panel" aria-labelledby="address-title">
-      <div className="section-heading">
+    <section className="panel pb-5" aria-labelledby="address-title">
+      <div className="section-heading px-4 pt-3.5 pb-3">
         <p className="eyebrow">거리 분석</p>
-        <h2 id="address-title">주소로 가까운 정류장 찾기</h2>
+        <h2 id="address-title" className="text-[18px] font-bold leading-tight text-heading">
+          주소로 가까운 정류장 찾기
+        </h2>
       </div>
 
       <form
-        className="search-form"
+        className="grid gap-3 px-4 pt-4"
         onSubmit={(event) => {
           event.preventDefault()
           onSearch()
@@ -76,53 +78,60 @@ export function AddressSearch({
       >
         <input
           aria-label="주소 또는 장소명"
-          className="search-input"
+          className="field"
           onChange={(event) => onAddressChange(event.target.value)}
           placeholder="예: 원주시 무실동 / 단구초등학교"
           value={address}
         />
-        <div className="search-actions">
-          <button className="primary-button" disabled={geocoding} type="submit">
+        <div className="flex flex-wrap gap-2.5">
+          <button className="btn-primary" disabled={geocoding} type="submit">
             {geocoding ? '검색 중…' : '검색'}
           </button>
-          <button className="secondary-button" onClick={onReset} type="button">
+          <button className="btn-secondary" onClick={onReset} type="button">
             초기화
           </button>
         </div>
       </form>
 
       {error && (
-        <p className="search-error" role="alert">
+        <p
+          className="mx-4 mt-3.5 rounded-lg border border-danger-border bg-danger-bg px-3.5 py-3 font-bold text-danger"
+          role="alert"
+        >
           {error}
         </p>
       )}
 
       {selectedLocation && (
-        <div className="selected-location">
-          <strong>{selectedLocation.label}</strong>
-          <span>{selectedLocation.address}</span>
+        <div className="mx-4 mt-4 grid gap-1 rounded-lg border border-brand-soft-border bg-brand-soft px-4 py-3.5">
+          <strong className="text-brand-soft-fg">{selectedLocation.label}</strong>
+          <span className="text-[14px] text-fg">{selectedLocation.address}</span>
         </div>
       )}
 
       {candidates.length > 1 && (
-        <div className="candidate-list">
-          <p className="candidate-hint">
+        <div className="grid gap-2 px-4 pt-3.5">
+          <p className="m-0 text-[13px] font-bold text-fg">
             검색 결과 {candidates.length}건 — 정확한 위치를 선택하세요.
           </p>
-          <div className="candidate-scroll">
+          <div className="grid max-h-[230px] gap-2 overflow-y-auto pr-1 [scrollbar-width:thin]">
             {candidates.map((candidate, index) => {
               const selected =
                 selectedLocation?.lat === candidate.lat &&
                 selectedLocation?.lng === candidate.lng
               return (
                 <button
-                  className={`candidate-item ${selected ? 'selected' : ''}`}
+                  className={`grid gap-[3px] rounded-lg border px-[13px] py-[11px] text-left transition-colors ${
+                    selected
+                      ? 'border-brand bg-brand-soft'
+                      : 'border-border bg-surface hover:border-brand-soft-border'
+                  }`}
                   key={`${candidate.lat}-${candidate.lng}-${index}`}
                   onClick={() => onSelectCandidate(candidate)}
                   type="button"
                 >
-                  <strong>{candidate.label}</strong>
-                  <span>{candidate.address}</span>
+                  <strong className="text-[14px] text-heading">{candidate.label}</strong>
+                  <span className="text-[13px] text-subtle">{candidate.address}</span>
                 </button>
               )
             })}
@@ -131,15 +140,21 @@ export function AddressSearch({
       )}
 
       {recentSearches.length > 0 && (
-        <div className="recent-search">
-          <div className="recent-search-head">
-            <span className="recent-search-title">최근 검색 {recentSearches.length}</span>
-            <button className="recent-clear" onClick={onClearRecent} type="button">
+        <div className="mx-4 mt-4 border-t border-border pt-3.5">
+          <div className="mb-2.5 flex items-center justify-between">
+            <span className="text-[13px] font-extrabold text-fg">
+              최근 검색 {recentSearches.length}
+            </span>
+            <button
+              className="min-h-[28px] rounded-md px-2 py-1 text-[12px] font-bold text-subtle transition-colors hover:text-brand"
+              onClick={onClearRecent}
+              type="button"
+            >
               전체 지우기
             </button>
           </div>
           <div
-            className="recent-tabs"
+            className="flex cursor-grab select-none gap-2 overflow-x-auto pb-1 [scrollbar-width:thin] active:cursor-grabbing"
             onPointerDown={handlePointerDown}
             onPointerLeave={handlePointerUp}
             onPointerMove={handlePointerMove}
@@ -147,9 +162,12 @@ export function AddressSearch({
             ref={tabsRef}
           >
             {recentSearches.map((item) => (
-              <div className="recent-tab" key={`${item.savedAt}-${item.lat}-${item.lng}`}>
+              <div
+                className="flex flex-none items-center overflow-hidden rounded-full border border-border-strong bg-muted transition-colors hover:border-brand-soft-border"
+                key={`${item.savedAt}-${item.lat}-${item.lng}`}
+              >
                 <button
-                  className="recent-tab-run"
+                  className="max-w-[180px] truncate border-0 bg-transparent py-1.5 pl-[13px] pr-1 text-[13px] font-bold text-fg transition-colors hover:text-brand"
                   onClick={() => handleRunRecent(item)}
                   title={item.address}
                   type="button"
@@ -158,7 +176,7 @@ export function AddressSearch({
                 </button>
                 <button
                   aria-label={`${item.query} 삭제`}
-                  className="recent-tab-remove"
+                  className="flex h-[30px] w-6 items-center justify-center border-0 bg-transparent text-[17px] leading-none text-subtle transition-colors hover:text-red-500"
                   onClick={() => onRemoveRecent(item)}
                   type="button"
                 >

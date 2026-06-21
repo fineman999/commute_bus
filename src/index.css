@@ -1,6 +1,85 @@
+@import 'tailwindcss';
+
+/* 다크 모드는 .dark 클래스 전략 — 토글로 <html>에 .dark를 붙였다 뗀다 */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+  시맨틱 색상 토큰. 컴포넌트는 bg-surface / text-fg 처럼 토큰 유틸리티만 쓰고,
+  여기서 라이트/다크 값만 갈아끼우면 전체 테마가 따라온다.
+  (@theme inline 이 var() 를 그대로 참조하므로 .dark 오버라이드가 흐른다)
+*/
 :root {
-  color: #172033;
-  background: #f5f7fb;
+  --canvas: #f5f7fb;
+  --surface: #ffffff;
+  --muted: #f8fafc;
+  --hover: #f0f7ff;
+  --border: #e2e8f0;
+  --border-strong: #d8dee9;
+  --fg: #334155;
+  --heading: #0f172a;
+  --subtle: #64748b;
+  --brand: #2563eb;
+  --brand-strong: #1d4ed8;
+  --brand-fg: #ffffff;
+  --brand-soft: #eff6ff;
+  --brand-soft-fg: #1d4ed8;
+  --brand-soft-border: #bfdbfe;
+  --danger: #b91c1c;
+  --danger-bg: #fef2f2;
+  --danger-border: #fecaca;
+  --ring: #93c5fd;
+  --overlay-label-bg: rgba(255, 255, 255, 0.92);
+  --shadow-card: 0 8px 24px rgb(15 23 42 / 0.06);
+}
+
+.dark {
+  --canvas: #0b1120;
+  --surface: #161e2d;
+  --muted: #1b2536;
+  --hover: #1e2a40;
+  --border: #2a3650;
+  --border-strong: #334155;
+  --fg: #cbd5e1;
+  --heading: #f1f5f9;
+  --subtle: #94a3b8;
+  --brand: #3b82f6;
+  --brand-strong: #60a5fa;
+  --brand-fg: #ffffff;
+  --brand-soft: rgba(59, 130, 246, 0.14);
+  --brand-soft-fg: #93c5fd;
+  --brand-soft-border: rgba(59, 130, 246, 0.45);
+  --danger: #fca5a5;
+  --danger-bg: rgba(239, 68, 68, 0.12);
+  --danger-border: rgba(239, 68, 68, 0.4);
+  --ring: #3b82f6;
+  --overlay-label-bg: rgba(22, 30, 45, 0.92);
+  --shadow-card: 0 8px 24px rgb(0 0 0 / 0.45);
+}
+
+@theme inline {
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-muted: var(--muted);
+  --color-hover: var(--hover);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-fg: var(--fg);
+  --color-heading: var(--heading);
+  --color-subtle: var(--subtle);
+  --color-brand: var(--brand);
+  --color-brand-strong: var(--brand-strong);
+  --color-brand-fg: var(--brand-fg);
+  --color-brand-soft: var(--brand-soft);
+  --color-brand-soft-fg: var(--brand-soft-fg);
+  --color-brand-soft-border: var(--brand-soft-border);
+  --color-danger: var(--danger);
+  --color-danger-bg: var(--danger-bg);
+  --color-danger-border: var(--danger-border);
+  --color-ring: var(--ring);
+  --shadow-card: var(--shadow-card);
+}
+
+:root {
   font-family:
     Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
     sans-serif;
@@ -11,14 +90,16 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-* {
-  box-sizing: border-box;
-}
-
 body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  background: var(--canvas);
+  color: var(--fg);
+  /* 테마 전환 시 배경/글자색이 부드럽게 바뀌도록 */
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
 }
 
 button,
@@ -26,6 +107,149 @@ input {
   font: inherit;
 }
 
-button {
-  cursor: pointer;
+/* 키보드 포커스 가시성 — 마우스 클릭엔 안 뜨고 키보드 탐색 시에만 링 표시 */
+:focus-visible {
+  outline: 3px solid var(--ring);
+  outline-offset: 2px;
+}
+
+/*
+  여러 컴포넌트에서 반복되는 구조 프리미티브. 토큰 유틸리티를 @apply 로 묶어
+  마크업을 단순하게 유지하고 라이트/다크 양쪽에서 일관성을 보장한다.
+*/
+@layer components {
+  .panel {
+    @apply rounded-lg border border-border bg-surface shadow-card;
+  }
+
+  .section-heading {
+    @apply border-b border-border px-[22px] pt-5 pb-4;
+  }
+
+  .eyebrow {
+    @apply mb-2 text-[13px] font-extrabold text-brand;
+  }
+
+  .field {
+    @apply w-full rounded-md border border-border-strong bg-surface px-3 py-[11px] text-heading transition-colors placeholder:text-subtle;
+  }
+
+  .field:focus {
+    @apply border-brand;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    @apply inline-flex min-h-[42px] items-center justify-center rounded-md px-4 font-extrabold transition-colors disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  .btn-primary {
+    @apply border border-brand-strong bg-brand text-brand-fg hover:bg-brand-strong;
+  }
+
+  .btn-secondary {
+    @apply border border-border-strong bg-surface text-fg hover:border-brand-soft-border;
+  }
+
+  .empty-state {
+    @apply rounded-lg border border-dashed border-border-strong bg-muted p-4 text-fg;
+  }
+
+  .chip {
+    @apply rounded-full border border-border-strong bg-muted px-[9px] py-[5px] text-[13px] font-bold text-fg;
+  }
+}
+
+/*
+  지도 오버레이 — 카카오맵에 HTML 문자열로 주입되므로 Tailwind 유틸리티 대신
+  토큰 변수를 쓰는 컴포넌트 클래스로 유지한다.
+*/
+@layer components {
+  .map-stop-dot {
+    display: block;
+    width: 12px;
+    height: 12px;
+    border: 2px solid var(--surface);
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgb(15 23 42 / 0.4);
+  }
+
+  .map-stop-dot.focused {
+    width: 18px;
+    height: 18px;
+    border-color: #d97706;
+    box-shadow: 0 0 0 4px rgb(217 119 6 / 0.3);
+  }
+
+  .map-stop-label {
+    display: inline-block;
+    margin-top: 6px;
+    padding: 1px 6px;
+    border-radius: 6px;
+    background: var(--overlay-label-bg);
+    color: var(--heading);
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+    box-shadow: 0 1px 2px rgb(15 23 42 / 0.2);
+  }
+
+  .map-stop-label.focused {
+    background: #d97706;
+    color: #ffffff;
+  }
+
+  .map-user-pin {
+    display: inline-block;
+    padding: 4px 9px;
+    border-radius: 999px;
+    background: var(--brand);
+    color: var(--brand-fg);
+    font-size: 12px;
+    font-weight: 800;
+    white-space: nowrap;
+    box-shadow: 0 2px 6px rgb(37 99 235 / 0.5);
+  }
+
+  .map-rank-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border: 2px solid var(--surface);
+    border-radius: 50%;
+    background: #ef4444;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 800;
+    box-shadow: 0 1px 4px rgb(15 23 42 / 0.5);
+  }
+
+  .map-spinner {
+    width: 18px;
+    height: 18px;
+    flex: none;
+    border: 2px solid var(--border-strong);
+    border-top-color: var(--brand);
+    border-radius: 50%;
+    animation: map-spin 0.7s linear infinite;
+  }
+}
+
+@keyframes map-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 모션 최소화 환경 존중 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

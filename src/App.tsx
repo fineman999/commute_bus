@@ -16,12 +16,13 @@ import {
   type SavedSearch,
 } from './lib/searchStorage'
 import type { Direction, NearestResult } from './types/route'
-import './App.css'
+import { useTheme } from './lib/useTheme'
 
 const firstRouteId = (dir: Direction) =>
   routes.find((route) => route.direction === dir)?.id ?? routes[0].id
 
 function App() {
+  const { theme, toggleTheme } = useTheme()
   const [direction, setDirection] = useState<Direction>('출근')
   const [visibleRouteIds, setVisibleRouteIds] = useState<number[]>(() => [firstRouteId('출근')])
   const [detailRouteId, setDetailRouteId] = useState<number>(() => firstRouteId('출근'))
@@ -189,53 +190,69 @@ function App() {
   }
 
   return (
-    <main className="app">
-      <header className="app-header">
+    <main className="mx-auto w-[calc(100%-24px)] pb-14 pt-7 min-[900px]:w-[min(1180px,calc(100%-32px))] min-[900px]:pt-10">
+      <header className="mb-7 grid grid-cols-1 items-end gap-8 min-[900px]:grid-cols-[minmax(0,1fr)_auto]">
         <div>
           <p className="eyebrow">원주 통근버스</p>
-          <h1>노선 확인과 거리 분석</h1>
-          <p className="header-copy">
+          <h1 className="mb-3 max-w-[680px] text-[34px] font-bold leading-[1.12] text-heading min-[900px]:text-[44px]">
+            노선 확인과 거리 분석
+          </h1>
+          <p className="mb-0 max-w-[720px] text-[17px] text-fg">
             건강보험심사평가원 출퇴근 통근버스 노선을 지도에서 비교하고, 집을 구할 때 어느
             동네가 타기 편한지 빠르게 확인합니다.
           </p>
         </div>
-        <dl className="stats">
-          <div>
-            <dt>{direction} 노선</dt>
-            <dd>{directionRoutes.length}</dd>
-          </div>
-          <div>
-            <dt>정류장</dt>
-            <dd>{directionStops}</dd>
-          </div>
-          <div>
-            <dt>표시 중</dt>
-            <dd>{visibleRouteIds.length}</dd>
-          </div>
-        </dl>
+        <div className="flex flex-col items-start gap-3 min-[900px]:items-end">
+          <button
+            aria-label={theme === 'dark' ? '라이트 모드로 전환' : '다크 모드로 전환'}
+            className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-[13px] font-bold text-fg transition-colors hover:border-brand-soft-border"
+            onClick={toggleTheme}
+            type="button"
+          >
+            {theme === 'dark' ? '☀️ 라이트' : '🌙 다크'}
+          </button>
+          <dl className="m-0 grid w-full grid-cols-1 gap-2.5 min-[560px]:grid-cols-3">
+            <div className="min-w-[86px] rounded-lg border border-border-strong bg-surface px-4 py-3.5">
+              <dt className="text-[13px] text-subtle">{direction} 노선</dt>
+              <dd className="mt-0.5 text-[26px] font-extrabold text-heading">
+                {directionRoutes.length}
+              </dd>
+            </div>
+            <div className="min-w-[86px] rounded-lg border border-border-strong bg-surface px-4 py-3.5">
+              <dt className="text-[13px] text-subtle">정류장</dt>
+              <dd className="mt-0.5 text-[26px] font-extrabold text-heading">{directionStops}</dd>
+            </div>
+            <div className="min-w-[86px] rounded-lg border border-border-strong bg-surface px-4 py-3.5">
+              <dt className="text-[13px] text-subtle">표시 중</dt>
+              <dd className="mt-0.5 text-[26px] font-extrabold text-heading">
+                {visibleRouteIds.length}
+              </dd>
+            </div>
+          </dl>
+        </div>
       </header>
 
-      <div className="direction-toggle" role="group" aria-label="출퇴근 방향 선택">
-        <button
-          aria-pressed={direction === '출근'}
-          className={direction === '출근' ? 'active' : ''}
+      <div
+        className="mb-5 grid max-w-[440px] grid-cols-2 gap-2 rounded-[10px] border border-border-strong bg-surface p-1.5 shadow-card"
+        role="group"
+        aria-label="출퇴근 방향 선택"
+      >
+        <DirectionButton
+          active={direction === '출근'}
           onClick={() => changeDirection('출근')}
-          type="button"
-        >
-          출근 <span>2사옥 도착</span>
-        </button>
-        <button
-          aria-pressed={direction === '퇴근'}
-          className={direction === '퇴근' ? 'active' : ''}
+          label="출근"
+          sub="2사옥 도착"
+        />
+        <DirectionButton
+          active={direction === '퇴근'}
           onClick={() => changeDirection('퇴근')}
-          type="button"
-        >
-          퇴근 <span>1사옥 출발</span>
-        </button>
+          label="퇴근"
+          sub="1사옥 출발"
+        />
       </div>
 
-      <section className="map-layout" aria-label="지도 분석">
-        <div className="map-column">
+      <section className="grid grid-cols-1 gap-5" aria-label="지도 분석">
+        <div className="min-w-0">
           <MapView
             focusedStopId={focusedStopId}
             nearestResults={nearestResults}
@@ -245,7 +262,7 @@ function App() {
           />
         </div>
 
-        <div className="control-column">
+        <div className="grid grid-cols-1 items-start gap-5 min-[820px]:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.2fr)]">
           <AddressSearch
             address={address}
             candidates={candidates}
@@ -262,9 +279,11 @@ function App() {
             selectedLocation={selectedLocation}
           />
           <section className="panel" aria-labelledby="nearest-title">
-            <div className="section-heading">
+            <div className="section-heading px-4 pt-3.5 pb-3">
               <p className="eyebrow">Top 3</p>
-              <h2 id="nearest-title">가까운 {direction} 정류장</h2>
+              <h2 id="nearest-title" className="text-[18px] font-bold leading-tight text-heading">
+                가까운 {direction} 정류장
+              </h2>
             </div>
             <div aria-live="polite">
               <NearestResults
@@ -286,11 +305,38 @@ function App() {
         </div>
       </section>
 
-      <section className="analysis-grid secondary-grid" aria-label="동네 추천 및 노선 상세">
+      <section
+        className="mt-5 grid grid-cols-1 items-start gap-5 min-[900px]:grid-cols-[minmax(300px,0.92fr)_minmax(0,1.08fr)]"
+        aria-label="동네 추천 및 노선 상세"
+      >
         <NeighborhoodSummary />
         <RouteDetail route={detailRoute} />
       </section>
     </main>
+  )
+}
+
+interface DirectionButtonProps {
+  active: boolean
+  onClick: () => void
+  label: string
+  sub: string
+}
+
+function DirectionButton({ active, onClick, label, sub }: DirectionButtonProps) {
+  return (
+    <button
+      aria-pressed={active}
+      className={`grid gap-0.5 rounded-lg border px-3 py-2.5 text-[15px] font-extrabold transition-colors ${
+        active
+          ? 'border-brand-strong bg-brand text-brand-fg'
+          : 'border-transparent bg-muted text-fg'
+      }`}
+      onClick={onClick}
+      type="button"
+    >
+      {label} <span className={`text-[11px] font-bold ${active ? 'text-blue-100' : 'text-subtle'}`}>{sub}</span>
+    </button>
   )
 }
 
