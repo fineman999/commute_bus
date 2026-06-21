@@ -52,17 +52,28 @@ export function MapView({
     }
   }, [])
 
-  // 창 크기가 바뀌면 지도를 컨테이너에 다시 맞춘다(relayout 안 하면 깨짐)
+  // 컨테이너 크기가 바뀌면 지도를 다시 맞춘다(relayout 안 하면 타일이 컨테이너 밖으로 새서
+  // 좌측 컨트롤을 덮음). window resize는 그리드 reflow 전에 발생해 폭이 stale이라
+  // 컨테이너 자체를 ResizeObserver로 보고, relayout은 다음 프레임(레이아웃 확정 후)에 실행.
   useEffect(() => {
-    function handleResize() {
-      const map = mapRef.current
-      if (!map) return
-      const center = map.getCenter()
-      map.relayout()
-      map.setCenter(center)
+    const container = containerRef.current
+    if (!container) return
+    let frame = 0
+    const observer = new ResizeObserver(() => {
+      cancelAnimationFrame(frame)
+      frame = requestAnimationFrame(() => {
+        const map = mapRef.current
+        if (!map) return
+        const center = map.getCenter()
+        map.relayout()
+        map.setCenter(center)
+      })
+    })
+    observer.observe(container)
+    return () => {
+      cancelAnimationFrame(frame)
+      observer.disconnect()
     }
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
   }, [])
 
   // 표시 노선/검색/포커스가 바뀔 때마다 오버레이 다시 그림
