@@ -46,6 +46,8 @@ interface KakaoMap {
   setBounds(bounds: KakaoLatLngBounds): void
   setCenter(latlng: KakaoLatLng): void
   setLevel(level: number): void
+  getCenter(): KakaoLatLng
+  relayout(): void
 }
 
 // Marker / Polyline / CustomOverlay 공통: 지도에 붙이고 떼는 인터페이스

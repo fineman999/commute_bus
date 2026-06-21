@@ -204,27 +204,27 @@ function App() {
         </dl>
       </header>
 
+      <div className="direction-toggle" role="group" aria-label="출퇴근 방향 선택">
+        <button
+          aria-pressed={direction === '출근'}
+          className={direction === '출근' ? 'active' : ''}
+          onClick={() => changeDirection('출근')}
+          type="button"
+        >
+          출근 <span>2사옥 도착</span>
+        </button>
+        <button
+          aria-pressed={direction === '퇴근'}
+          className={direction === '퇴근' ? 'active' : ''}
+          onClick={() => changeDirection('퇴근')}
+          type="button"
+        >
+          퇴근 <span>1사옥 출발</span>
+        </button>
+      </div>
+
       <section className="map-layout" aria-label="지도 분석">
         <div className="control-column">
-          <div className="direction-toggle" role="group" aria-label="출퇴근 방향 선택">
-            <button
-              aria-pressed={direction === '출근'}
-              className={direction === '출근' ? 'active' : ''}
-              onClick={() => changeDirection('출근')}
-              type="button"
-            >
-              출근 <span>2사옥 도착</span>
-            </button>
-            <button
-              aria-pressed={direction === '퇴근'}
-              className={direction === '퇴근' ? 'active' : ''}
-              onClick={() => changeDirection('퇴근')}
-              type="button"
-            >
-              퇴근 <span>1사옥 출발</span>
-            </button>
-          </div>
-
           <AddressSearch
             address={address}
             candidates={candidates}

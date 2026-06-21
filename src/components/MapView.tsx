@@ -52,6 +52,19 @@ export function MapView({
     }
   }, [])
 
+  // 창 크기가 바뀌면 지도를 컨테이너에 다시 맞춘다(relayout 안 하면 깨짐)
+  useEffect(() => {
+    function handleResize() {
+      const map = mapRef.current
+      if (!map) return
+      const center = map.getCenter()
+      map.relayout()
+      map.setCenter(center)
+    }
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
   // 표시 노선/검색/포커스가 바뀔 때마다 오버레이 다시 그림
   useEffect(() => {
     const map = mapRef.current

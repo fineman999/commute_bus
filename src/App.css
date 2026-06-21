@@ -353,7 +353,7 @@ h3 {
 
 @media (max-width: 900px) {
   .app {
-    width: min(100% - 24px, 680px);
+    width: calc(100% - 24px);
     padding-top: 28px;
   }
 
@@ -605,6 +605,7 @@ h3 {
 }
 
 .map-view {
+  position: relative;
   height: 620px;
   margin: 14px 22px 0;
   border: 1px solid #e2e8f0;
@@ -672,9 +673,49 @@ h3 {
 /* 지도 중심 레이아웃 */
 .map-layout {
   display: grid;
-  grid-template-columns: minmax(320px, 380px) minmax(0, 1fr);
+  grid-template-columns: minmax(260px, 300px) minmax(0, 1fr);
   gap: 20px;
   align-items: start;
+}
+
+/* 좌측 컨트롤 컬럼은 더 작고 촘촘하게 */
+.control-column .section-heading {
+  padding: 14px 16px 12px;
+}
+
+.control-column h2 {
+  font-size: 18px;
+}
+
+.control-column .search-form {
+  padding: 16px 16px 0;
+}
+
+.control-column .candidate-list,
+.control-column .nearest-list,
+.control-column .route-card-list {
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+.control-column .recent-search,
+.control-column .empty-state,
+.control-column .search-error,
+.control-column .selected-location {
+  margin-left: 16px;
+  margin-right: 16px;
+}
+
+.control-column .route-card {
+  padding: 12px;
+}
+
+.control-column .route-card-title {
+  font-size: 16px;
+}
+
+.control-column .nearest-item {
+  padding: 10px;
 }
 
 .control-column {
@@ -686,6 +727,8 @@ h3 {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
+  max-width: 440px;
+  margin: 0 0 20px;
   padding: 6px;
   border: 1px solid #d8dee9;
   border-radius: 10px;
@@ -723,8 +766,7 @@ h3 {
 }
 
 .map-column {
-  position: sticky;
-  top: 20px;
+  min-width: 0;
 }
 
 /* 노선 선택 카드 */
@@ -811,13 +853,9 @@ h3 {
   color: #ffffff;
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 780px) {
   .map-layout {
     grid-template-columns: 1fr;
-  }
-
-  .map-column {
-    position: static;
   }
 
   .map-view {
