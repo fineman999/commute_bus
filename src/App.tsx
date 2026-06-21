@@ -224,6 +224,16 @@ function App() {
       </div>
 
       <section className="map-layout" aria-label="지도 분석">
+        <div className="map-column">
+          <MapView
+            focusedStopId={focusedStopId}
+            nearestResults={nearestResults}
+            routes={directionRoutes}
+            userLocation={selectedLocation}
+            visibleRouteIds={visibleRouteIds}
+          />
+        </div>
+
         <div className="control-column">
           <AddressSearch
             address={address}
@@ -258,16 +268,6 @@ function App() {
             onShowAll={showAllRoutes}
             onToggleRoute={toggleRoute}
             routes={directionRoutes}
-            visibleRouteIds={visibleRouteIds}
-          />
-        </div>
-
-        <div className="map-column">
-          <MapView
-            focusedStopId={focusedStopId}
-            nearestResults={nearestResults}
-            routes={directionRoutes}
-            userLocation={selectedLocation}
             visibleRouteIds={visibleRouteIds}
           />
         </div>

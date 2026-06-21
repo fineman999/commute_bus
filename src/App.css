@@ -670,12 +670,11 @@ h3 {
   }
 }
 
-/* 지도 중심 레이아웃 */
+/* 지도 중심 레이아웃: 지도를 위에 full-width, 컨트롤은 아래에 가로 배치 */
 .map-layout {
   display: grid;
-  grid-template-columns: minmax(260px, 300px) minmax(0, 1fr);
+  grid-template-columns: 1fr;
   gap: 20px;
-  align-items: start;
 }
 
 /* 좌측 컨트롤 컬럼은 더 작고 촘촘하게 */
@@ -720,6 +719,8 @@ h3 {
 
 .control-column {
   display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.2fr);
+  align-items: start;
   gap: 20px;
 }
 
@@ -853,8 +854,8 @@ h3 {
   color: #ffffff;
 }
 
-@media (max-width: 780px) {
-  .map-layout {
+@media (max-width: 820px) {
+  .control-column {
     grid-template-columns: 1fr;
   }
 
